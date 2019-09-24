@@ -11,7 +11,7 @@ def exitOnBadPath(path):
         print(f"'{path}' is not valid")
         sys.exit(-1)
 
-def processFile(mediaFp, localizationsFp, outputDir, nameAttribute):
+def processFile(mediaFp, localizationsFp, outputDir):
     # Read in localizations
     with open(localizationsFp, 'r') as localizationsF:
         localizations=json.load(localizationsF)
@@ -38,10 +38,10 @@ def processFile(mediaFp, localizationsFp, outputDir, nameAttribute):
         if frame_num in grouped_by_frame:
             print(f"Extracting localizations from {frame_num}")
             extractThumbnails(image, grouped_by_frame[frame_num],
-                              outputDir,nameAttribute)
+                              outputDir)
         frame_num += 1
 
-def extractThumbnails(image, localizations, outputDir,nameAttribute):
+def extractThumbnails(image, localizations, outputDir):
     for localization in localizations:
         output_name = f"{localization['id']}.png"
         output_fp = os.path.join(outputDir, output_name)
@@ -73,8 +73,6 @@ if __name__=="__main__":
     parser.add_argument("--outputDir", "-o",
                         required=False,
                         default=os.getcwd())
-    parser.add_argument("--nameAttribute", "-n",
-                        required=False)
 
     args = parser.parse_args()
 
@@ -82,4 +80,4 @@ if __name__=="__main__":
     exitOnBadPath(args.localizations)
 
     sys.exit(processFile(args.input, args.localizations,
-             args.outputDir, args.nameAttribute))
+             args.outputDir))

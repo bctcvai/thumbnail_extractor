@@ -9,5 +9,7 @@ test:
 
 .PHONY: docker_test
 docker_test: config.json
+	rm -rf tmp/*
 	tator_testHarness.py config.json tator/setup.py
-	tator_testHarness.py config.json extractor/docker_entry.py
+	docker run --rm -v$(shell pwd)/tmp:/work -eTATOR_WORK_DIR=/work $(IMAGE_NAME)
+	tator_testHarness.py config.json tator/teardown.py

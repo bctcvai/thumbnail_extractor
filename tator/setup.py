@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import pytator
 import os
@@ -39,7 +39,7 @@ if __name__ == '__main__':
             media_localizations=tator.Localization.filter(
                 {'media_id': media['id'],
                  'type': box_type_id})
-            
+
             if media_localizations:
                 print(f"Fetching {media['name']}")
                 media_unique_name = f"{media['id']}_{media['name']}"
@@ -54,4 +54,3 @@ if __name__ == '__main__':
                 work_frame=pd.DataFrame(data=[data],
                                         columns=data.keys())
                 work_frame.to_csv(work_filepath, index=False)
-                
