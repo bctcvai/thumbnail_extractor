@@ -1,0 +1,2 @@
+test/big_buck_bunny.mp4 filter=lfs diff=lfs merge=lfs -text
+test/image.jpg filter=lfs diff=lfs merge=lfs -text
