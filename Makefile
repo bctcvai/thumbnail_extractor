@@ -12,7 +12,7 @@ test:
 .PHONY: docker_test
 docker_test: config.json
 	mkdir -p tmp
-	docker run --rm -v$(shell pwd)/tmp:/work -eTATOR_WORK_DIR=/work $(IMAGE_NAME) rm -fr "/work/*"
+	docker run --rm -v$(shell pwd)/tmp:/work -eTATOR_WORK_DIR=/work $(IMAGE_NAME) clean.sh 
 	tator_testHarness.py config.json tator/setup.py
 	docker run --rm -v$(shell pwd)/tmp:/work -eTATOR_WORK_DIR=/work $(IMAGE_NAME)
 	tator_testHarness.py config.json tator/teardown.py
