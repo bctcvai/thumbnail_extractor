@@ -20,9 +20,7 @@ def uploadThumbnails(tator, thumbnail_type_id, directory):
                                section="Thumbnails")
             media=tator.Media.byMd5(md5)
 
-        print(localization_id)
         localization=tator.Localization.get(localization_id)
-        print(localization)
         media_attrs=media['attributes']
         media_attrs.update(localization['attributes'])
         tator.Media.applyAttribute(media['id'], media_attrs)

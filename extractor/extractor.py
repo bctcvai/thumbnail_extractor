@@ -5,6 +5,7 @@ import cv2
 import os
 import sys
 import json
+import numpy as np
 
 def exitOnBadPath(path):
     if not os.path.isfile(path):
@@ -34,7 +35,8 @@ def processFile(mediaFp, localizationsFp, outputDir):
         vid_len = int(vid.get(cv2.cv.CV_CAP_PROP_FRAME_COUNT))
 
     frame_num = 0
-    while frame_num < vid_len:
+    max_frame = np.max(list(grouped_by_frame.keys()))
+    while frame_num <= max_frame:
         ok,image = vid.read()
         if not ok:
             raise RuntimeError("Failed to grab video frame")
