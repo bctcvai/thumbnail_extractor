@@ -18,6 +18,9 @@ def processFile(mediaFp, localizationsFp, outputDir):
 
     grouped_by_frame={}
     for localization in localizations:
+        if localization['thumbnail_image']:
+            print("Skipping localization with valid thumbnail")
+            continue
         frame = localization['frame']
         if frame in grouped_by_frame:
             grouped_by_frame[frame].append(localization)
