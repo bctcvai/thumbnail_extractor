@@ -3,6 +3,7 @@
 import pytator
 import json
 import os
+import sys
 
 def uploadThumbnails(tator, thumbnail_type_id, directory):
     for dir_element in os.listdir(directory):
@@ -25,7 +26,11 @@ if __name__ == '__main__':
     token = os.getenv('TATOR_AUTH_TOKEN')
     project_id = os.getenv('TATOR_PROJECT_ID')
     pipeline_args_str = os.getenv('TATOR_PIPELINE_ARGS')
-    pipeline_args = json.loads(pipeline_args_str)
+    if pipeline_args_str:
+        pipeline_args = json.loads(pipeline_args_str)
+    else:
+        print("ERROR: No pipeline arguments specified!")
+        sys.exit(-1)
     thumbnail_type_id = pipeline_args['imageTypeId']
 
     tator = pytator.Tator(rest_svc, token, project_id)
