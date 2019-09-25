@@ -9,17 +9,23 @@ def uploadThumbnails(tator, thumbnail_type_id, directory):
     for dir_element in os.listdir(directory):
         full_path=os.path.join(directory, dir_element)
         localization_id=int(os.path.splitext(dir_element)[0])
-        md5=pytator.md5sum.md5_sum(full_path)
-        tator.Media.uploadFile(thumbnail_type_id,
+        media=tator.Media.byName(dir_element)
+        if not media:
+            md5=pytator.md5sum.md5_sum(full_path)
+            tator.Media.uploadFile(thumbnail_type_id,
                                full_path,
                                waitForTranscode=True,
                                progressBars=False,
                                md5=md5,
                                section="Thumbnails")
-        media=tator.Media.byMd5(md5)
+            media=tator.Media.byMd5(md5)
 
+        print(localization_id)
         localization=tator.Localization.get(localization_id)
-        tator.Media.applyAttribute(media['id'], localization['attributes'])
+        print(localization)
+        media_attrs=media['attributes']
+        media_attrs.update(localization['attributes'])
+        tator.Media.applyAttribute(media['id'], media_attrs)
         tator.Localization.update(localization_id,
                                   {"thumbnail_image": media['id']})
 
