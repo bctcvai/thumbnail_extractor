@@ -35,7 +35,11 @@ def processFile(mediaFp, localizationsFp, outputDir):
         vid_len = int(vid.get(cv2.cv.CV_CAP_PROP_FRAME_COUNT))
 
     frame_num = 0
-    max_frame = np.max(list(grouped_by_frame.keys()))
+    if len(grouped_by_frame.keys()) > 0:
+        max_frame = np.max(list(grouped_by_frame.keys()))
+    else:
+        print("Nothing to extract")
+        max_frame = 0
     while frame_num <= max_frame:
         ok,image = vid.read()
         if not ok:
