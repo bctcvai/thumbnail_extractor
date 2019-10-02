@@ -2,6 +2,8 @@ PRODUCT_NAME=cvisionai/thumbnail_extractor
 IMAGE_NAME=$(PRODUCT_NAME):latest-$(shell whoami)
 PUBLISHED_NAME=${DOCKERHUB_USER}/$(PRODUCT_NAME):latest
 
+ARGUMENTS=$(shell cat config.json | jq .TATOR_PIPELINE_ARGS)
+
 build:
 	docker build -t $(IMAGE_NAME) -f tator/Dockerfile .
 
@@ -14,7 +16,7 @@ docker_test: config.json
 	mkdir -p tmp
 	docker run --rm -v$(shell pwd)/tmp:/work -eTATOR_WORK_DIR=/work $(IMAGE_NAME) clean.sh 
 	tator_testHarness.py config.json tator/setup.py
-	docker run --rm -v$(shell pwd)/tmp:/work -eTATOR_WORK_DIR=/work $(IMAGE_NAME)
+	docker run --rm -v$(shell pwd)/tmp:/work -eTATOR_WORK_DIR=/work -eTATOR_PIPELINE_ARGS=$(ARGUMENTS) $(IMAGE_NAME)
 	tator_testHarness.py config.json tator/teardown.py
 
 .PHONY: publish
