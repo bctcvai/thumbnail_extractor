@@ -45,7 +45,7 @@ def uploadThumbnails(tator, dest_tator, mode, thumbnail_type_id, directory, sect
                     continue
                 print(f"importing {state_type['type']['name']}")
                 for entry in states:
-                    if entry['frame'] != frame:
+                    if entry['association']['frame'] != frame:
                         continue
                     obj={'media_ids': media['id'],
                          'frame': 0, #images are always frame 0
