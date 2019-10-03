@@ -12,21 +12,29 @@ def exitOnBadPath(path):
         print(f"'{path}' is not valid")
         sys.exit(-1)
 
-def processFile(mediaFp, localizationsFp, outputDir):
-    # Read in localizations
-    with open(localizationsFp, 'r') as localizationsF:
-        localizations=json.load(localizationsF)
+def processFile(mediaFp, mode, metadataFp, outputDir):
+    # Read in metadata
+    with open(metadataFp, 'r') as metadataF:
+        metadata=json.load(metadataF)
 
     grouped_by_frame={}
-    for localization in localizations:
-        if localization['thumbnail_image']:
-            print("Skipping localization with valid thumbnail")
-            continue
-        frame = localization['frame']
-        if frame in grouped_by_frame:
-            grouped_by_frame[frame].append(localization)
-        else:
-            grouped_by_frame[frame] = [localization]
+    if mode == "state":
+        for entry in metadata:
+            frame = entry['association']['frame']
+            if frame in grouped_by_frame:
+                grouped_by_frame[frame].append(entry)
+            else:
+                grouped_by_frame[frame] = [entry]
+    else:
+        for entry in metadata:
+            if entry['thumbnail_image']:
+                print("Skipping entry with valid thumbnail")
+                continue
+            frame = entry['frame']
+            if frame in grouped_by_frame:
+                grouped_by_frame[frame].append(entry)
+            else:
+                grouped_by_frame[frame] = [entry]
 
     vid = cv2.VideoCapture(mediaFp)
     if cv2.__version__ >= "3.2.0":
@@ -44,10 +52,16 @@ def processFile(mediaFp, localizationsFp, outputDir):
         ok,image = vid.read()
         if not ok:
             raise RuntimeError("Failed to grab video frame")
-        if frame_num in grouped_by_frame:
-            print(f"Extracting localizations from {frame_num}")
-            extractThumbnails(image, grouped_by_frame[frame_num],
-                              outputDir)
+        else:
+            if frame_num in grouped_by_frame:
+                print(f"Extracting metadata from {frame_num}")
+                if mode == 'state':
+                    output_name = f"{frame_num}.png"
+                    output_fp = os.path.join(outputDir, output_name)
+                    cv2.imwrite(output_fp, image)
+                else:
+                    extractThumbnails(image, grouped_by_frame[frame_num],
+                                      outputDir)
         frame_num += 1
 
 def extractThumbnails(image, localizations, outputDir):
@@ -68,17 +82,19 @@ def extractThumbnails(image, localizations, outputDir):
                           thumb_x:thumb_x+thumb_width,
                           :];
         cv2.imwrite(output_fp, thumbnail)
-        
+
 if __name__=="__main__":
     parser = argparse.ArgumentParser(description="Thumbnail Extractor")
     parser.add_argument("--input", "-i",
                         required=True,
                         type=str,
                         help="Input Media File")
-    parser.add_argument("--localizations", "-l",
+    parser.add_argument("--metadata", "-m",
                         required=True,
                         type=str,
-                        help="Input Localization File")
+                        help="Input Metadata File")
+    parser.add_argument("--mode",
+                        required=True)
     parser.add_argument("--outputDir", "-o",
                         required=False,
                         default=os.getcwd())
@@ -86,7 +102,9 @@ if __name__=="__main__":
     args = parser.parse_args()
 
     exitOnBadPath(args.input)
-    exitOnBadPath(args.localizations)
+    exitOnBadPath(args.metadata)
 
-    sys.exit(processFile(args.input, args.localizations,
-             args.outputDir))
+    sys.exit(processFile(args.input,
+                         args.mode,
+                         args.metadata,
+                         args.outputDir))

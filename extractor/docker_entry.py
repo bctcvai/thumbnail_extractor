@@ -22,5 +22,6 @@ if __name__=="__main__":
         except:
             pass
         extractor.processFile(os.path.join(work_dir,work['media']),
-                              os.path.join(work_dir,work['localizations']),
+                              pipeline_args['mode'],
+                              os.path.join(work_dir,work['metadata']),
                               image_workpath)
