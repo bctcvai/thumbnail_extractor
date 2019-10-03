@@ -1,4 +1,4 @@
-PRODUCT_NAME=cvisionai/thumbnail_extractor
+PRODUCT_NAME=cvisionai/frame_extractor
 IMAGE_NAME=$(PRODUCT_NAME):latest-$(shell whoami)
 PUBLISHED_NAME=${DOCKERHUB_USER}/$(PRODUCT_NAME):latest
 
