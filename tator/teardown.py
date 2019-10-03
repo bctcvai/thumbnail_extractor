@@ -5,7 +5,7 @@ import json
 import os
 import sys
 
-def uploadThumbnails(tator, dest_tator, thumbnail_type_id, directory):
+def uploadThumbnails(tator, dest_tator, mode, thumbnail_type_id, directory):
     for dir_element in os.listdir(directory):
         full_path=os.path.join(directory, dir_element)
         localization_id=int(os.path.splitext(dir_element)[0])
@@ -20,12 +20,16 @@ def uploadThumbnails(tator, dest_tator, thumbnail_type_id, directory):
                                section="Thumbnails")
             media=tator.Media.byMd5(md5)
 
-        localization=tator.Localization.get(localization_id)
-        media_attrs=media['attributes']
-        media_attrs.update(localization['attributes'])
-        tator.Media.applyAttribute(media['id'], media_attrs)
-        tator.Localization.update(localization_id,
-                                  {"thumbnail_image": media['id']})
+        if mode == "state" or "localization_keyframe":
+            #TODO: Duplicate state objects
+            pass
+        elif mode == "localization_thumbnail":
+            localization=tator.Localization.get(localization_id)
+            media_attrs=media['attributes']
+            media_attrs.update(localization['attributes'])
+            tator.Media.applyAttribute(media['id'], media_attrs)
+            tator.Localization.update(localization_id,
+                                      {"thumbnail_image": media['id']})
 
 if __name__ == '__main__':
     rest_svc = os.getenv('TATOR_API_SERVICE')
@@ -40,6 +44,7 @@ if __name__ == '__main__':
         sys.exit(-1)
     thumbnail_type_id = pipeline_args['imageTypeId']
     dest_project_id = pipeline_args.get('destProject', project_id)
+    mode = pipeline_args.get('mode', None)
 
     tator = pytator.Tator(rest_svc, token, project_id)
     dest_tator = pytator.Tator(rest_svc, token, dest_project_id)
@@ -47,4 +52,4 @@ if __name__ == '__main__':
     for dir_element in os.listdir(work_dir):
         full_path=os.path.join(work_dir, dir_element)
         if os.path.isdir(full_path):
-            uploadThumbnails(tator, dest_tator, thumbnail_type_id, full_path)
+            uploadThumbnails(tator, dest_tator, mode, thumbnail_type_id, full_path)

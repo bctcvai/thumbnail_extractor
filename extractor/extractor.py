@@ -18,7 +18,7 @@ def processFile(mediaFp, mode, metadataFp, outputDir):
         metadata=json.load(metadataF)
 
     grouped_by_frame={}
-    if mode == "state":
+    if mode == "state" or mode == "localization_keyframe":
         for entry in metadata:
             frame = entry['association']['frame']
             if frame in grouped_by_frame:
@@ -55,7 +55,7 @@ def processFile(mediaFp, mode, metadataFp, outputDir):
         else:
             if frame_num in grouped_by_frame:
                 print(f"Extracting metadata from {frame_num}")
-                if mode == 'state':
+                if mode == 'state' or mode == 'localization_keyframe':
                     output_name = f"{frame_num}.png"
                     output_fp = os.path.join(outputDir, output_name)
                     cv2.imwrite(output_fp, image)
