@@ -64,7 +64,8 @@ def processFile(mediaFp, mode, metadataFp, outputDir):
             if frame_num in grouped_by_frame:
                 print(f"Extracting metadata from {frame_num}")
                 if mode == 'state' or mode == 'localization_keyframe':
-                    output_name = f"{frame_num}.png"
+                    output_name = os.path.basename(mediaFp)
+                    output_name += f"_{frame_num}.png"
                     output_fp = os.path.join(outputDir, output_name)
                     cv2.imwrite(output_fp, image)
                 else:

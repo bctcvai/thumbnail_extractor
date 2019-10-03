@@ -9,7 +9,7 @@ def uploadThumbnails(tator, dest_tator, mode, thumbnail_type_id, directory, sect
     for dir_element in os.listdir(directory):
         full_path=os.path.join(directory, dir_element)
         original_media_id = os.path.basename(directory).split('_')[0]
-        localization_id_or_frame=int(os.path.splitext(dir_element)[0])
+        localization_id_or_frame=os.path.splitext(dir_element)[0]
         md5=pytator.md5sum.md5_sum(full_path)
         media=dest_tator.Media.byMd5(md5)
         if not media:
@@ -25,7 +25,7 @@ def uploadThumbnails(tator, dest_tator, mode, thumbnail_type_id, directory, sect
 
         if mode == "state" or mode == "localization_keyframe":
             print("processing localizations/states from video into image")
-            frame = localization_id_or_frame
+            frame = int(localization_id_or_frame.split('_')[-1])
             # Iterate over each state type that belongs to the destination
             # image type.
             state_types=dest_tator.StateType.filter({'media_id':media['id']})
@@ -95,7 +95,7 @@ def uploadThumbnails(tator, dest_tator, mode, thumbnail_type_id, directory, sect
                         obj['y'] = entry['y']
                     tator.Localization.new(obj)
         elif mode == "localization_thumbnail":
-            localization_id = localization_id_or_frame
+            localization_id = int(localization_id_or_frame)
             localization=tator.Localization.get(localization_id)
             media_attrs=media['attributes']
             media_attrs.update(localization['attributes'])
