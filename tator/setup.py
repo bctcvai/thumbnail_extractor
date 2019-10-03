@@ -13,20 +13,39 @@ if __name__ == '__main__':
     work_dir = os.getenv('TATOR_WORK_DIR')
     token=os.getenv('TATOR_AUTH_TOKEN')
     project_id=os.getenv('TATOR_PROJECT_ID')
+    pipeline_args_str = os.getenv('TATOR_PIPELINE_ARGS')
+    if pipeline_args_str:
+        pipeline_args = json.loads(pipeline_args_str)
+    else:
+        pipeline_args = {}
     tator=pytator.Tator(rest_svc, token, project_id)
 
     all_medias=tator.Media.all()
-    all_types=tator.LocalizationType.all()
-    box_type=None
-    for typeObj in all_types:
-        if typeObj['type']['dtype'] == 'box':
-            box_type=typeObj
-            break
 
-    if box_type == None:
-        print("No Box Types")
+    mode=pipeline_args.get("mode", None)
+    if mode == "localization_thumbnail" or mode == "localization_keyframe":
+        # TODO: handle multiple state types
+        local_types=tator.LocalizationType.all()
+        frame_type=None
+        for typeObj in local_types:
+            if typeObj['type']['dtype'] == 'box':
+                box_type=typeObj
+                break
+    elif mode == "state":
+        state_types=tator.StateType.all()
+        box_type=None
+        for typeObj in state_types:
+            if typeObj['type']['association'] == 'Frame':
+                frame_type=typeObj
+                break
+    else:
+        print("No mode specified to pipeline")
         sys.exit(-1)
-    box_type_id = box_type['type']['id']
+
+    type_id = pipeline_args.get("type_id", None)
+    if type_id == None:
+        print("No type id specified.")
+        sys.exit(-1)
 
     work_filepath=os.path.join(work_dir, "work.csv")
     try:
@@ -34,23 +53,35 @@ if __name__ == '__main__':
     except:
         pass
 
+    # First write CSV header
+    cols=['media', 'metadata']
+    work_frame=pd.DataFrame(columns=cols)
+    work_frame.to_csv(work_filepath, index=False)
+
     for media in all_medias:
         if media['id'] in media_ids:
-            media_localizations=tator.Localization.filter(
-                {'media_id': media['id'],
-                 'type': box_type_id})
+            media_unique_name = f"{media['id']}_{media['name']}"
+            media_filepath = os.path.join(work_dir,media_unique_name)
+            data={'media': media_unique_name}
 
-            if media_localizations:
+            if mode == "localization_thumbnail" or mode == "localization_keyframe":
+                metadata=tator.Localization.filter(
+                    {'media_id': media['id'],
+                     'type': type_id})
+            elif mode == "state":
+                metadata=tator.State.filter(
+                    {'media_id': media['id'],
+                     'type': type_id})
+
+            if metadata:
                 print(f"Fetching {media['name']}")
-                media_unique_name = f"{media['id']}_{media['name']}"
-                media_filepath = os.path.join(work_dir,media_unique_name)
                 tator.Media.downloadFile(media, media_filepath)
                 json_filename = os.path.splitext(media_unique_name)[0] + '.json'
                 json_filepath = os.path.join(work_dir, json_filename)
                 with open(json_filepath, 'w') as json_file:
-                    json.dump(media_localizations, json_file)
-                data={'media': media_unique_name,
-                      'localizations': json_filename}
+                    json.dump(metadata, json_file)
+                    data.update({'metadata': json_filename})
+
                 work_frame=pd.DataFrame(data=[data],
-                                        columns=data.keys())
-                work_frame.to_csv(work_filepath, index=False)
+                                    columns=cols)
+                work_frame.to_csv(work_filepath, index=False, header=False, mode='a')
