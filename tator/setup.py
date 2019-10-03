@@ -58,30 +58,30 @@ if __name__ == '__main__':
     work_frame=pd.DataFrame(columns=cols)
     work_frame.to_csv(work_filepath, index=False)
 
-    for media in all_medias:
-        if media['id'] in media_ids:
-            media_unique_name = f"{media['id']}_{media['name']}"
-            media_filepath = os.path.join(work_dir,media_unique_name)
-            data={'media': media_unique_name}
+    for media_id in media_ids:
+        media = tator.Media.get(media_id)
+        media_unique_name = f"{media['id']}_{media['name']}"
+        media_filepath = os.path.join(work_dir,media_unique_name)
+        data={'media': media_unique_name}
 
-            if mode == "localization_thumbnail" or mode == "localization_keyframe":
-                metadata=tator.Localization.filter(
-                    {'media_id': media['id'],
-                     'type': type_id})
-            elif mode == "state":
-                metadata=tator.State.filter(
-                    {'media_id': media['id'],
-                     'type': type_id})
+        if mode == "localization_thumbnail" or mode == "localization_keyframe":
+            metadata=tator.Localization.filter(
+                {'media_id': media['id'],
+                 'type': type_id})
+        elif mode == "state":
+            metadata=tator.State.filter(
+                {'media_id': media['id'],
+                 'type': type_id})
 
-            if metadata:
-                print(f"Fetching {media['name']}")
-                tator.Media.downloadFile(media, media_filepath)
-                json_filename = os.path.splitext(media_unique_name)[0] + '.json'
-                json_filepath = os.path.join(work_dir, json_filename)
-                with open(json_filepath, 'w') as json_file:
-                    json.dump(metadata, json_file)
-                    data.update({'metadata': json_filename})
+        if metadata:
+            print(f"Fetching {media['name']}")
+            tator.Media.downloadFile(media, media_filepath)
+            json_filename = os.path.splitext(media_unique_name)[0] + '.json'
+            json_filepath = os.path.join(work_dir, json_filename)
+            with open(json_filepath, 'w') as json_file:
+                json.dump(metadata, json_file)
+                data.update({'metadata': json_filename})
 
-                work_frame=pd.DataFrame(data=[data],
-                                    columns=cols)
-                work_frame.to_csv(work_filepath, index=False, header=False, mode='a')
+            work_frame=pd.DataFrame(data=[data],
+                                columns=cols)
+            work_frame.to_csv(work_filepath, index=False, header=False, mode='a')
