@@ -23,7 +23,8 @@ def uploadThumbnails(tator, dest_tator, mode, thumbnail_type_id, directory):
         else:
             print("Frame Extraction Media found in db.")
 
-        if mode == "state" or "localization_keyframe":
+        if mode == "state" or mode == "localization_keyframe":
+            print("processing localizations/states from video into image")
             frame = localization_id_or_frame
             # Iterate over each state type that belongs to the destination
             # image type.
@@ -32,35 +33,41 @@ def uploadThumbnails(tator, dest_tator, mode, thumbnail_type_id, directory):
                 state_types=[]
             for state_type in state_types:
                 type_id = state_type['type']['id']
-                states=tator.State.get({'type': type_id,
-                                        'media' : original_media_id})
+                states=tator.State.filter({'type': type_id,
+                                        'media_id' : original_media_id})
+                if states is None:
+                    continue
                 print(f"importing {state_type['type']['name']}")
                 for entry in states:
                     if entry['frame'] != frame:
                         continue
                     obj={'media_ids': media['id'],
                          'frame': 0, #images are always frame 0
-                         'type' : state_type['type']}
+                         'type' : state_type['type']['id']}
                     obj.update(entry['attributes'])
                     tator.State.new(obj)
 
             #Clone types from localizations
-            localization_types=dest_tator.StateType.filter({'media_id':
+            localization_types=dest_tator.LocalizationType.filter({'media_id':
                                                             media['id']})
             if localization_types is None:
                 localization_types=[]
             for localization_type in localization_types:
                 type_id = localization_type['type']['id']
                 dtype = localization_type['type']['dtype']
-                print(f"importing {localization_type['type']['name']}")
-                localizations=tator.Localization.get({'type': type_id,
-                                                      'media' : original_media_id})
+                print(f"importing {localization_type['type']['name']} objects")
+                localizations=tator.Localization.filter({'type': type_id,
+                                                         'media_id' : original_media_id})
+                if localizations is None:
+                    print(f"No localizations found on {frame}")
+                    continue
+
                 for entry in localizations:
                     if entry['frame'] != frame:
                         continue
                     obj={'media_id': media['id'],
                          'frame': 0, #images are always frame 0
-                         'type' : state_type['type']}
+                         'type' : localization_type['type']['id']}
                     obj.update(entry['attributes'])
                     if dtype == 'box':
                         obj['x'] = entry['x']
@@ -76,7 +83,6 @@ def uploadThumbnails(tator, dest_tator, mode, thumbnail_type_id, directory):
                         obj['x'] = entry['x']
                         obj['y'] = entry['y']
                     tator.Localization.new(obj)
-            pass
         elif mode == "localization_thumbnail":
             localization_id = localization_id_or_frame
             localization=tator.Localization.get(localization_id)

@@ -18,9 +18,17 @@ def processFile(mediaFp, mode, metadataFp, outputDir):
         metadata=json.load(metadataF)
 
     grouped_by_frame={}
-    if mode == "state" or mode == "localization_keyframe":
+    if mode == "state":
         for entry in metadata:
             frame = entry['association']['frame']
+            if frame in grouped_by_frame:
+                grouped_by_frame[frame].append(entry)
+            else:
+                grouped_by_frame[frame] = [entry]
+
+    elif mode == "localization_keyframe":
+        for entry in metadata:
+            frame = entry['frame']
             if frame in grouped_by_frame:
                 grouped_by_frame[frame].append(entry)
             else:
