@@ -35,6 +35,12 @@ def uploadThumbnails(tator, dest_tator, mode, thumbnail_type_id, directory, sect
                 type_id = state_type['type']['id']
                 states=tator.State.filter({'type': type_id,
                                         'media_id' : original_media_id})
+                dest_states = tator.State.filter({'type': type_id,
+                                                  'media_id' : media['id']})
+                if dest_states:
+                    print("Not adding duplicate states to extracted imagery")
+                    continue
+
                 if states is None:
                     continue
                 print(f"importing {state_type['type']['name']}")
@@ -58,6 +64,11 @@ def uploadThumbnails(tator, dest_tator, mode, thumbnail_type_id, directory, sect
                 print(f"importing {localization_type['type']['name']} objects")
                 localizations=tator.Localization.filter({'type': type_id,
                                                          'media_id' : original_media_id})
+                dest_localizations=tator.Localization.filter({'type': type_id,
+                                                              'media_id' : media['id']})
+                if dest_localizations:
+                    print(f"Not re-adding localizations from extracted image")
+                    continue
                 if localizations is None:
                     print(f"No localizations found on {frame}")
                     continue
