@@ -5,7 +5,7 @@ import json
 import os
 import sys
 
-def uploadThumbnails(tator, dest_tator, mode, thumbnail_type_id, directory):
+def uploadThumbnails(tator, dest_tator, mode, thumbnail_type_id, directory, sectionName):
     for dir_element in os.listdir(directory):
         full_path=os.path.join(directory, dir_element)
         original_media_id = os.path.basename(directory).split('_')[0]
@@ -14,11 +14,11 @@ def uploadThumbnails(tator, dest_tator, mode, thumbnail_type_id, directory):
         media=dest_tator.Media.byMd5(md5)
         if not media:
             dest_tator.Media.uploadFile(thumbnail_type_id,
-                               full_path,
-                               waitForTranscode=True,
-                               progressBars=False,
-                               md5=md5,
-                               section="Thumbnails")
+                                        full_path,
+                                        waitForTranscode=True,
+                                        progressBars=False,
+                                        md5=md5,
+                                        section=sectionName)
             media=tator.Media.byMd5(md5)
         else:
             print("Frame Extraction Media found in db.")
@@ -109,8 +109,8 @@ if __name__ == '__main__':
 
     tator = pytator.Tator(rest_svc, token, project_id)
     dest_tator = pytator.Tator(rest_svc, token, dest_project_id)
-
+    dest_section = pipeline_args.get("dest_section", "Extracted Frames")
     for dir_element in os.listdir(work_dir):
         full_path=os.path.join(work_dir, dir_element)
         if os.path.isdir(full_path):
-            uploadThumbnails(tator, dest_tator, mode, thumbnail_type_id, full_path)
+            uploadThumbnails(tator, dest_tator, mode, thumbnail_type_id, full_path, dest_section)
