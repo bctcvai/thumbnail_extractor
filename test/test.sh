@@ -2,7 +2,7 @@
 
 code=0
 rm -fr test_out/*
-python3 extractor/extractor.py -i test/big_buck_bunny.mp4 -l test/big_buck_bunny.json -o test_out
+python3 extractor/extractor.py --mode localization_thumbnail -i test/big_buck_bunny.mp4 -m test/big_buck_bunny.json -o test_out
 vid_count=`ls test_out | wc -l`
 
 if [ ${vid_count} -ne 15 ]; then
@@ -10,7 +10,7 @@ if [ ${vid_count} -ne 15 ]; then
     code=255
 fi
 
-python3 extractor/extractor.py -i test/image.jpg -l test/image.json -o test_out
+python3 extractor/extractor.py --mode localization_thumbnail -i test/image.jpg -m test/image.json -o test_out
 # Do checks
 
 total_count=`ls test_out | wc -l`
