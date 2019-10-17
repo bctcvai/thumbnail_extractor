@@ -56,11 +56,16 @@ def processFile(mediaFp, mode, metadataFp, outputDir):
     else:
         print("Nothing to extract")
         max_frame = 0
+
+    fail_count = 0
     while frame_num <= max_frame:
         ok,image = vid.read()
         if not ok:
-            raise RuntimeError("Failed to grab video frame")
+            fail_count += 1
+            if fail_count >= 10:
+                raise RuntimeError("Failed to grab video frame")
         else:
+            fail_count = 0
             if frame_num in grouped_by_frame:
                 print(f"Extracting metadata from {frame_num}")
                 if mode == 'state' or mode == 'localization_keyframe':
