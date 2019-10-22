@@ -24,20 +24,9 @@ if __name__ == '__main__':
 
     mode=pipeline_args.get("mode", None)
     if mode == "localization_thumbnail" or mode == "localization_keyframe":
-        # TODO: handle multiple state types
-        local_types=tator.LocalizationType.all()
-        frame_type=None
-        for typeObj in local_types:
-            if typeObj['type']['dtype'] == 'box':
-                box_type=typeObj
-                break
+        pass
     elif mode == "state":
-        state_types=tator.StateType.all()
-        box_type=None
-        for typeObj in state_types:
-            if typeObj['type']['association'] == 'Frame':
-                frame_type=typeObj
-                break
+        pass
     else:
         print("No mode specified to pipeline")
         sys.exit(-1)
@@ -74,14 +63,30 @@ if __name__ == '__main__':
                  'type': type_id})
 
         if metadata:
-            print(f"Fetching {media['name']}")
-            tator.Media.downloadFile(media, media_filepath)
-            json_filename = os.path.splitext(media_unique_name)[0] + '.json'
-            json_filepath = os.path.join(work_dir, json_filename)
-            with open(json_filepath, 'w') as json_file:
-                json.dump(metadata, json_file)
-                data.update({'metadata': json_filename})
+            skip_file = True
+            # Check to see if we need to process this file
+            for element in metadata:
+                if 'association' in entry:
+                    frame = entry['association']['frame']
+                else:
+                    frame = entry['frame']
+                extracted_name = f"{entry['id']}_{media['name']}_{frame}.png"
+                extracted_element = tator.Media.filter({"name": extracted_name})
+                if extracted_element is None:
+                    skip_file = False
+                    break
 
-            work_frame=pd.DataFrame(data=[data],
+            if skip_file:
+                print(f"Skipping {media['name']}")
+            else:
+                print(f"Fetching {media['name']}")
+                tator.Media.downloadFile(media, media_filepath)
+                json_filename = os.path.splitext(media_unique_name)[0] + '.json'
+                json_filepath = os.path.join(work_dir, json_filename)
+                with open(json_filepath, 'w') as json_file:
+                    json.dump(metadata, json_file)
+                    data.update({'metadata': json_filename})
+
+                work_frame=pd.DataFrame(data=[data],
                                 columns=cols)
-            work_frame.to_csv(work_filepath, index=False, header=False, mode='a')
+                work_frame.to_csv(work_filepath, index=False, header=False, mode='a')
