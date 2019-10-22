@@ -66,11 +66,11 @@ if __name__ == '__main__':
             skip_file = True
             # Check to see if we need to process this file
             for element in metadata:
-                if 'association' in entry:
-                    frame = entry['association']['frame']
+                if 'association' in element:
+                    frame = element['association']['frame']
                 else:
-                    frame = entry['frame']
-                extracted_name = f"{entry['id']}_{media['name']}_{frame}.png"
+                    frame = element['frame']
+                extracted_name = f"{element['id']}_{media['name']}_{frame}.png"
                 extracted_element = tator.Media.filter({"name": extracted_name})
                 if extracted_element is None:
                     skip_file = False
