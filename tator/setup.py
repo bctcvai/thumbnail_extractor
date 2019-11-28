@@ -72,7 +72,7 @@ if __name__ == '__main__':
                     frame = element['frame']
                 extracted_name = f"{element['id']}_{media['name']}_{frame}.png"
                 extracted_element = tator.Media.filter({"name": extracted_name})
-                if extracted_element is None:
+                if extracted_element is None or mode == 'localization_thumbnail':
                     skip_file = False
                     break
 
