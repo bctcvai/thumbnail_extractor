@@ -42,6 +42,8 @@ if __name__ == '__main__':
     except:
         pass
 
+    exclude_rules=pipeline_args.get("exclude", None)
+
     # First write CSV header
     cols=['media', 'metadata']
     work_frame=pd.DataFrame(columns=cols)
@@ -79,6 +81,13 @@ if __name__ == '__main__':
             if skip_file:
                 print(f"Skipping {media['name']}")
             else:
+                # Process exclude rules for thumbnail creation
+                if exclude_rules:
+                    print(f"Processing exclude rules {exclude_rules}")
+                    for idx,el in enumerate(metadata):
+                        for rule in exclude_rules:
+                            if el.attributes[rule[0]] == rule[1]:
+                                del metadata[idx]
                 print(f"Fetching {media['name']}")
                 tator.Media.downloadFile(media, media_filepath)
                 json_filename = os.path.splitext(media_unique_name)[0] + '.json'
