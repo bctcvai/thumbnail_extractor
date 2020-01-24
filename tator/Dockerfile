@@ -9,7 +9,8 @@ build-essential cmake ffmpeg git wget ssh vim \
                 python3-pip python3-dev python3-opencv  \
                 && apt-get clean && rm -fr /var/lib/apt/lists/*
 RUN pip3 install --no-cache-dir wheel setuptools pillow==6.0.0 \
-                                progressbar2==3.42.0 pandas==0.24.2
+                                progressbar2==3.42.0 pandas==0.24.2 setuptools
+RUN pip3 install --no-cache-dir pytator
 
 WORKDIR /
 COPY extractor /extractor
