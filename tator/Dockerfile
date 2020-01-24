@@ -14,4 +14,8 @@ RUN pip3 install --no-cache-dir wheel setuptools pillow==6.0.0 \
 WORKDIR /
 COPY extractor /extractor
 COPY tator/clean.sh /usr/bin/clean.sh
-CMD  [ "python3", "/extractor/docker_entry.py" ]
+COPY tator/setup.py /usr/bin/setup.py
+COPY tator/teardown.py /usr/bin/teardown.py
+
+#CMD  [ "python3", "/extractor/docker_entry.py" ]
+CMD [ "bash " ]
