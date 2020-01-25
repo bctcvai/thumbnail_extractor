@@ -67,7 +67,7 @@ def processFile(mediaFp, mode, metadataFp, outputDir):
         else:
             fail_count = 0
             if frame_num in grouped_by_frame:
-                print(f"Extracting metadata from {frame_num}")
+                print(f"Extracting metadata from {mediaFp}:{frame_num} {max_frame}")
                 if mode == 'state' or mode == 'localization_keyframe':
                     output_name = os.path.basename(mediaFp)
                     output_name += f"_{frame_num}.png"
@@ -76,6 +76,8 @@ def processFile(mediaFp, mode, metadataFp, outputDir):
                 else:
                     extractThumbnails(image, grouped_by_frame[frame_num],
                                       outputDir)
+            else:
+                pass #print(f"Skipping {frame_num} of {max_frame}")
         frame_num += 1
 
 def extractThumbnails(image, localizations, outputDir):
