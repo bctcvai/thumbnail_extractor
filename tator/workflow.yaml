@@ -12,7 +12,7 @@ spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
         requests:
-          storage: 100Mi
+          storage: 200Gi
   templates:
   - name: pipeline
     steps:
@@ -34,6 +34,10 @@ spec:
         value: "{{workflow.parameters.rest_token}}"
       - name: TATOR_PROJECT_ID
         value: "{{workflow.parameters.project_id}}"
+      - name: TATOR_WORK_DIR
+        value: "/work"
+      - name: TATOR_PIPELINE_ARGS
+        value: "{\"imageTypeId\": 43, \"mode\": \"state\", \"type_id\": 31, \"dest_section\": \"FSCS Keyframes (Fall 2018)\"}"
       volumeMounts:
       - name: workdir
         mountPath: /work
@@ -51,6 +55,10 @@ spec:
         value: "{{workflow.parameters.rest_token}}"
       - name: TATOR_PROJECT_ID
         value: "{{workflow.parameters.project_id}}"
+      - name: TATOR_WORK_DIR
+        value: "/work"
+      - name: TATOR_PIPELINE_ARGS
+        value: "{\"imageTypeId\": 43, \"mode\": \"state\", \"type_id\": 31, \"dest_section\": \"FSCS Keyframes (Fall 2018)\"}"
       volumeMounts:
       - name: workdir
         mountPath: /work
@@ -68,6 +76,10 @@ spec:
         value: "{{workflow.parameters.rest_token}}"
       - name: TATOR_PROJECT_ID
         value: "{{workflow.parameters.project_id}}"
+      - name: TATOR_WORK_DIR
+        value: "/work"
+      - name: TATOR_PIPELINE_ARGS
+        value: "{\"imageTypeId\": 43, \"mode\": \"state\", \"type_id\": 31, \"dest_section\": \"FSCS Keyframes (Fall 2018)\"}"
       volumeMounts:
       - name: workdir
         mountPath: /work
