@@ -4,6 +4,7 @@ import pytator
 import json
 import os
 import sys
+import time
 
 def uploadThumbnails(tator, dest_tator, mode, thumbnail_type_id, directory, sectionName):
     for dir_element in os.listdir(directory):
@@ -13,15 +14,21 @@ def uploadThumbnails(tator, dest_tator, mode, thumbnail_type_id, directory, sect
         md5=pytator.md5sum.md5_sum(full_path)
         media=dest_tator.Media.byMd5(md5)
         if not media:
+            print(f"Uploading {dir_element} ({md5})")
             dest_tator.Media.uploadFile(thumbnail_type_id,
                                         full_path,
                                         waitForTranscode=True,
                                         progressBars=False,
                                         md5=md5,
                                         section=sectionName)
-            media=tator.Media.byMd5(md5)
+            # Something odd is going on server side to need this
+            # sleep... (TODO)
+            time.sleep(1.0)
+            media=tator.Media.filter({"name":dir_element})[0]
         else:
+            print(f"While processing {full_path}:")
             print("Frame Extraction Media found in db.")
+            print(f"{media['name']} ({media['id']})")
 
         if mode == "state" or mode == "localization_keyframe":
             print("processing localizations/states from video into image")
