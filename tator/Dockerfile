@@ -10,7 +10,8 @@ build-essential cmake ffmpeg git wget ssh vim \
                 && apt-get clean && rm -fr /var/lib/apt/lists/*
 RUN pip3 install --no-cache-dir wheel setuptools pillow==6.0.0 \
                                 progressbar2==3.42.0 pandas==0.24.2 setuptools
-RUN pip3 install --no-cache-dir pytator
+COPY tator/PyTator-0.0.3-py3-none-any.whl /PyTator-0.0.3-py3-none-any.whl
+RUN pip3 install PyTator-0.0.3-py3-none-any.whl
 
 WORKDIR /
 COPY extractor /extractor
