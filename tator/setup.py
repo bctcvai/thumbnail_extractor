@@ -88,7 +88,7 @@ if __name__ == '__main__':
                         for rule in exclude_rules:
                             if el.attributes[rule[0]] == rule[1]:
                                 del metadata[idx]
-                print(f"Fetching {media['name']}")
+                print(f"Fetching {media['name']} for frame {frame}")
                 tator.Media.downloadFile(media, media_filepath)
                 json_filename = os.path.splitext(media_unique_name)[0] + '.json'
                 json_filepath = os.path.join(work_dir, json_filename)
