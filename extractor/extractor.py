@@ -89,10 +89,22 @@ def extractThumbnails(image, localizations, outputDir):
         height=image.shape[0]
         width=image.shape[1]
 
+        # Check for annotations starting off screen
+        if localization.get('x') < 0:
+            localization['x'] = 0
+        if localization.get('y') < 0:
+            localization['y'] = 0
+
         thumb_height = int(height * localization['height'])
         thumb_width = int(width * localization['width'])
         thumb_y = int(height * localization['y'])
         thumb_x = int(width * localization['x'])
+
+        # Check for annotations extending off screen
+        if thumb_x + thumb_width > width:
+            thumb_width = width - thumb_x
+        if thumb_y + thumb_height > height:
+            thumb_height = height - thumb_y
 
         thumbnail = image[thumb_y:thumb_y+thumb_height,
                           thumb_x:thumb_x+thumb_width,
