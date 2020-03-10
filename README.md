@@ -36,11 +36,11 @@ Where:
 
 `mode`: One of
 
-     - `localization_keyframe`: Extracts whole frame duplicates localizations in new image
+- `localization_keyframe`: Extracts whole frame duplicates localizations in new image
 
-     - `localization_thumbnail`: Extracts content of localization box and applies attributes as media attributes to the resultant image.
+- `localization_thumbnail`: Extracts content of localization box and applies attributes as media attributes to the resultant image.
 
-     - `state`: Same as `localization_keyframe` but with `State` types.
+- `state`: Same as `localization_keyframe` but with `State` types.
 
 `type_id`: The underlying type of the object to base extractions off of.
 
